@@ -3,46 +3,72 @@ stages:
     cmd: python -m src.data_ingestion
     wdir: .
     deps:
-      - src/data_ingestion.py
+    - src/data_ingestion.py
     params:
-      - data_ingestion.test_size
-      - data_ingestion.random_state
+    - data_ingestion.test_size
+    - data_ingestion.random_state
     outs:
-      - data/raw
+    - data/raw
 
   preprocessing:
     cmd: python -m src.preprocessing
     wdir: .
     deps:
-      - data/raw
-      - src/preprocessing.py
+    - data/raw
+    - src/preprocessing.py
     params:
-      - preprocessing.scaler_type
+    - preprocessing.scaler_type
     outs:
-      - data/interim
+    - data/interim
 
   model_building:
     cmd: python -m src.model_building
     wdir: .
     deps:
-      - data/interim
-      - src/model_building.py
+    - data/interim
+    - src/model_building.py
     params:
-      - model_building.k_folds
-      - model_building.random_state
-      - model_building.base_learners
-      - model_building.meta_learner
+    - model_building.k_folds
+    - model_building.random_state
+    - model_building.base_learners
+    - model_building.meta_learner
     outs:
-      - models/stacking_model.pkl
+    - models/stacking_model.pkl
 
   model_evaluation:
     cmd: python -m src.model_evaluation
     wdir: .
     deps:
-      - models/stacking_model.pkl
-      - src/model_evaluation.py
+    - models/stacking_model.pkl
+    - src/model_evaluation.py
     outs:
-      - reports/comparison_table.csv
-      - reports/report.txt
-      - dvclive:
-          cache: false
+    - reports/comparison_table.csv
+    - reports/report.txt
+    - dvclive:
+        cache: false
+metrics:
+- dvclive/metrics.json
+plots:
+- dvclive/plots/metrics:
+    x: step
+- dvclive/plots/sklearn/confusion_matrix.json:
+    template: confusion
+    x: actual
+    y: predicted
+    title: Confusion Matrix
+    x_label: True Label
+    y_label: Predicted Label
+- dvclive/plots/sklearn/roc.json:
+    template: simple
+    x: fpr
+    y: tpr
+    title: Receiver operating characteristic (ROC)
+    x_label: False Positive Rate
+    y_label: True Positive Rate
+artifacts:
+  comparison_table:
+    path: reports/comparison_table.csv
+    type: table
+  report:
+    path: reports/report.txt
+    type: text
