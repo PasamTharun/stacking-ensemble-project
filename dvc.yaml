@@ -1,0 +1,48 @@
+stages:
+  data_ingestion:
+    cmd: python -m src.data_ingestion
+    wdir: .
+    deps:
+      - src/data_ingestion.py
+    params:
+      - data_ingestion.test_size
+      - data_ingestion.random_state
+    outs:
+      - data/raw
+
+  preprocessing:
+    cmd: python -m src.preprocessing
+    wdir: .
+    deps:
+      - data/raw
+      - src/preprocessing.py
+    params:
+      - preprocessing.scaler_type
+    outs:
+      - data/interim
+
+  model_building:
+    cmd: python -m src.model_building
+    wdir: .
+    deps:
+      - data/interim
+      - src/model_building.py
+    params:
+      - model_building.k_folds
+      - model_building.random_state
+      - model_building.base_learners
+      - model_building.meta_learner
+    outs:
+      - models/stacking_model.pkl
+
+  model_evaluation:
+    cmd: python -m src.model_evaluation
+    wdir: .
+    deps:
+      - models/stacking_model.pkl
+      - src/model_evaluation.py
+    outs:
+      - reports/comparison_table.csv
+      - reports/report.txt
+      - dvclive:
+          cache: false

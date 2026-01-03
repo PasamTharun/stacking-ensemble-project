@@ -1,0 +1,23 @@
+data_ingestion:
+  test_size: 0.2
+  random_state: 42
+
+preprocessing:
+  scaler_type: standard  # standard or minmax
+
+model_building:
+  k_folds: 5
+  random_state: 42
+  base_learners:
+    decision_tree:
+      max_depth: 6
+    logistic_regression:
+      C: 1.0
+    svc:
+      C: 1.0
+      kernel: rbf
+  meta_learner:
+    n_estimators: 100
+
+model_evaluation:
+  random_state: 42
