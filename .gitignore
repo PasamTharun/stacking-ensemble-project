@@ -6,8 +6,9 @@ __pycache__/
 # data and outputs
 data/
 models/
-
+dvc.lock
 dvclive/
+
 
 
 # C extensions
